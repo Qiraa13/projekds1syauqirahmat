@@ -121,30 +121,50 @@ elif selected == "Form Prediksi":
         st.markdown("---")
         st.markdown("### 📑 Kesimpulan & Hasil Analitis")
         
-        with st.spinner("Menghubungkan parameter ke simulasi model..."):
+        with st.spinner("Menghubungkan ke Model Machine Learning (MLflow Version)..."):
             
-            # --- Dummy / Mockup Logic (Simulation) ---
-            base_risk = 0.15
+            # --- REAL MACHINE LEARNING LOGIC ---
+            import joblib
+            try:
+                # Membaca model yang sudah dilatih dan disimpan oleh MLflow/train_model.py
+                model = joblib.load("attrition_model.pkl")
+                
+                input_df = pd.DataFrame([{
+                    "Department": department,
+                    "Age": age,
+                    "DailyRate": daily_rate,
+                    "OverTime": overtime,
+                    "WorkLifeBalance": work_life_balance,
+                    "TotalWorkingYears": total_working_years,
+                    "YearsAtCompany": years_at_company,
+                    "YearsInCurrentRole": years_in_current_role,
+                    "YearsSinceLastPromotion": years_since_last_promotion
+                }])
+                
+                try:
+                    prob = model.predict_proba(input_df)[0][1] # index 1 adalah 'Yes'
+                    probability = prob * 100
+                except Exception as inner_e:
+                    st.error(f"Error Model Probabilitas: {inner_e}")
+                    probability = 0
+            except Exception as e:
+                st.error(f"Error Membaca Model attrition_model.pkl: {e}")
+                probability = 0
+            
+            # Mempertahankan deteksi faktor secara manual untuk dijelaskan di UI
             risk_factors = []
             
             if overtime == "Yes":
-                base_risk += 0.35
                 risk_factors.append("Terlalu sering mengambil lembur (Beban kerja berat).")
             if work_life_balance < 3:
-                base_risk += 0.20
                 risk_factors.append(f"Tingkat Keseimbangan Kerja & Hidup rendah (Level {work_life_balance}).")
             if age < 30:
-                base_risk += 0.10
-                risk_factors.append("Kategori usia muda (Millennial/Gen Z) memiliki kecenderungan kutu loncat.")
+                risk_factors.append("Kategori usia muda (Millennial/Gen Z) memiliki mobilitas karir yang tinggi.")
             if years_since_last_promotion > 4:
-                base_risk += 0.15
                 risk_factors.append(f"Stagnansi karir, belum ada promosi selama {years_since_last_promotion} tahun.")
             if daily_rate < 500:
-                base_risk += 0.10
                 risk_factors.append("Insentif kompensasi *Daily Rate* di bawah rata-rata yang diharapkan.")
                 
-            probability = min(base_risk, 0.98) * 100
-            
             # Memvisualisasikan Output
             col_res_1, col_res_2 = st.columns([1, 2.5])
             
