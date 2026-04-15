@@ -172,8 +172,8 @@ elif selected == "Form Prediksi":
                 st.metric(label="🎯 Peluang Karyawan Resign", value=f"{probability:.1f}%")
                 color = "red" if probability >= 50 else "green"
                 st.markdown(f'''
-                    <div style="background-color: #e0e0e0; border-radius: 5px; width: 100%; height: 25px;">
-                      <div style="background-color: {color}; width: {probability}%; height: 100%; border-radius: 5px;"></div>
+                    <div style="background-color: #2E3440; border-radius: 5px; width: 100%; height: 25px; border: 1px solid #4C566A;">
+                      <div style="background-color: {color}; width: {probability}%; height: 100%; border-radius: 4px;"></div>
                     </div>
                 ''', unsafe_allow_html=True)
                 st.caption("Indikator Risiko Kritis")
